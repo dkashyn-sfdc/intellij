@@ -15,12 +15,12 @@
  */
 package com.google.idea.blaze.base.model;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.common.collect.ImmutableList;
 import com.google.idea.blaze.base.sync.libraries.LibraryModifier;
 import com.intellij.openapi.roots.libraries.Library;
 import java.io.File;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /** Provides files to be updated in {@link Library.ModifiableModel}. */
 public interface LibraryFilesProvider {
