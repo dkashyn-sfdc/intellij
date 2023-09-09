@@ -66,10 +66,11 @@ public class BepArtifactData {
   /** Combines this data with a newer version. */
   public BepArtifactData update(BepArtifactData newer) {
     Preconditions.checkState(artifact.getKey().equals(newer.artifact.getKey()));
-    topLevelTargets.addAll(newer.topLevelTargets);
+    Set<String> mergedTargets = new HashSet<>(topLevelTargets);
+    mergedTargets.addAll(newer.topLevelTargets);
     return new BepArtifactData(
         newer.artifact,
-        Sets.union(outputGroups, newer.outputGroups).immutableCopy(), topLevelTargets);
+        Sets.union(outputGroups, newer.outputGroups).immutableCopy(), mergedTargets);
   }
 
   /** The top-level targets this artifact is transitively associated with. */
