@@ -94,7 +94,7 @@ public class BlazeBuildOutputs {
     this.bepBytesConsumed = bepBytesConsumed;
 
     ImmutableSetMultimap.Builder<String, OutputArtifact> perTarget = ImmutableSetMultimap.builder();
-    artifacts.values().forEach(a -> a.topLevelTargets.forEach(t -> perTarget.put(t, a.artifact)));
+    artifacts.values().forEach(a -> a.getTopLevelTargets().forEach(t -> perTarget.put(t, a.artifact)));
     this.perTargetArtifacts = perTarget.build();
   }
 

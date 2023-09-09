@@ -29,8 +29,7 @@ public class BepArtifactData {
   public final OutputArtifact artifact;
   /** The output groups this artifact belongs to. */
   public final ImmutableSet<String> outputGroups;
-  /** The top-level targets this artifact is transitively associated with. */
-  public final ImmutableSet<String> topLevelTargets;
+  private final Set<String> topLevelTargets;
 
   BepArtifactData(
       OutputArtifact artifact,
@@ -38,7 +37,12 @@ public class BepArtifactData {
       Collection<String> topLevelTargets) {
     this.artifact = artifact;
     this.outputGroups = ImmutableSet.copyOf(outputGroups);
-    this.topLevelTargets = ImmutableSet.copyOf(topLevelTargets);
+    if (topLevelTargets instanceof HashSet<String>) {
+      this.topLevelTargets = (Set<String>) topLevelTargets;
+    } else {
+      this.topLevelTargets = new HashSet<>();
+      this.getTopLevelTargets().addAll(topLevelTargets);
+    }
   }
 
   @Override
@@ -62,9 +66,14 @@ public class BepArtifactData {
   /** Combines this data with a newer version. */
   public BepArtifactData update(BepArtifactData newer) {
     Preconditions.checkState(artifact.getKey().equals(newer.artifact.getKey()));
+    topLevelTargets.addAll(newer.topLevelTargets);
     return new BepArtifactData(
         newer.artifact,
-        Sets.union(outputGroups, newer.outputGroups).immutableCopy(),
-        Sets.union(topLevelTargets, newer.topLevelTargets).immutableCopy());
+        Sets.union(outputGroups, newer.outputGroups).immutableCopy(), topLevelTargets);
+  }
+
+  /** The top-level targets this artifact is transitively associated with. */
+  public Set<String> getTopLevelTargets() {
+    return topLevelTargets;
   }
 }
