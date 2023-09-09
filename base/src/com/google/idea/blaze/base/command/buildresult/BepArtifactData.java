@@ -40,8 +40,7 @@ public class BepArtifactData {
     if (topLevelTargets instanceof HashSet<String>) {
       this.topLevelTargets = (Set<String>) topLevelTargets;
     } else {
-      this.topLevelTargets = new HashSet<>();
-      this.getTopLevelTargets().addAll(topLevelTargets);
+      this.topLevelTargets = new HashSet<>(topLevelTargets);
     }
   }
 
