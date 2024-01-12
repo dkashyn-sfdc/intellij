@@ -113,7 +113,7 @@ public class BlazeReloadFileAction extends AnAction {
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.debug(String.format("Searching for classes to HotSwap for class %s with package %s among outputs %s", vf.getPath(), jarDirectory, artifactsForLogging));
                             } else {
-                                LOGGER.info(String.format("Searching for classes to HotSwap for class %s with package %s (if you want to see outputs that we scan you need to enable `debug` logging for `com.google.idea.blaze.java.run.hotswap.BlazeReloadFileAction`)", vf.getPath(), jarDirectory));
+                                LOGGER.info(String.format("Searching for classes to HotSwap for class %s with package %s", vf.getPath(), jarDirectory));
                             }
 
                             findAndCopyOutputFile(vf, tempOutputDir, jarDirectory, outputs);
@@ -191,7 +191,7 @@ public class BlazeReloadFileAction extends AnAction {
                         ZipEntry entry;
                         while ((entry = jis.getNextEntry()) != null) {
                             if (entry.isDirectory() && entry.getName().equals(jarDirectory)) {
-                                LOGGER.info("Found entries for target package " + jarDirectory);
+                                LOGGER.info(String.format("Found entries for target package %s in %s", jarDirectory, entry.getName()));
                                 int scannedEntries = 0;
                                 int foundEntries = 0;
                                 while ((entry = jis.getNextEntry()) != null && entry.getName().startsWith(jarDirectory)) {
