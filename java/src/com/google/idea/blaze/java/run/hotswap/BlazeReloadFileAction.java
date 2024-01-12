@@ -108,8 +108,8 @@ public class BlazeReloadFileAction extends AnAction {
                         public void run(@NotNull ProgressIndicator progressIndicator) {
                             // We want to be aware of entries like darwin_arm64-fastbuild/bin/some-api/lib-api.jar and not interested in darwin_arm64-fastbuild/external-api-0.0.654.jar
                             // TODO: It is a good idea to skip non-output artifacts.
-                            List<String> artifactsForLogging = outputs.artifacts.keySet().stream().filter(artifact -> artifact.split("/").length > 2).collect(Collectors.toList());
-                            // With Gateway in some cases actions got lost so we want to log this action for every invocation
+                            List<String> artifactsForLogging = outputs.artifacts.keySet().stream().filter(artifact -> artifact.indexOf("/") != artifact.lastIndexOf("/")).collect(Collectors.toList());
+                            // With Gateway in some cases actions got lost, so we want to log this action for every invocation
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.debug(String.format("Searching for classes to HotSwap for class %s with package %s among outputs %s", vf.getPath(), jarDirectory, artifactsForLogging));
                             } else {
