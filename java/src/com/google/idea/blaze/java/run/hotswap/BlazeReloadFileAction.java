@@ -52,6 +52,11 @@ public class BlazeReloadFileAction extends AnAction {
 
     private static final Logger LOGGER = Logger.getInstance(BlazeReloadFileAction.class);
     private static final Pattern INNER_CLASS_PATTERN = Pattern.compile("^(?:\\$\\w+)*$");
+    public static final String DEBUG_SESSION_NOT_STARTED_CLUE = " (debug session not started)";
+    public static final String NO_FILE_SELECTED_CLUE = " (no file selected)";
+    public static final String NO_JAVA_CLASS_SELECTED_CLUE = " (not Java class selected)";
+    public static final String SOURCE_ROOT_IS_MISSING_CLUE = " (no source root)";
+    private final String defaultActionText;
 
     private final AnAction delegate;
 
@@ -61,6 +66,7 @@ public class BlazeReloadFileAction extends AnAction {
                 delegate.getTemplatePresentation().getDescription(),
                 delegate.getTemplatePresentation().getIcon());
         this.delegate = delegate;
+        this.defaultActionText = delegate.getTemplatePresentation().getTextWithMnemonic();
     }
 
     @Override
@@ -194,16 +200,38 @@ public class BlazeReloadFileAction extends AnAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         delegate.update(e);
-        if (e.getPresentation().isEnabled()) {
+        // We want to give a hint why action is not enabled so we need to have it visible at all times this is possible
+        if (!e.getPresentation().isVisible()) {
+            e.getPresentation().setVisible(true);
+        }
+
             DebuggerSession session =
                     DebuggerManagerEx.getInstanceEx(e.getProject()).getContext().getDebuggerSession();
             VirtualFile vf = e.getData(CommonDataKeys.VIRTUAL_FILE);
-            if (session != null && vf != null) {
-                VirtualFile sourceRoot = ProjectFileIndex.getInstance(e.getProject()).getSourceRootForFile(vf);
-                e.getPresentation().setEnabled(sourceRoot != null);
+        String reasonNotToEnable = "";
+        if (session == null) {
+            reasonNotToEnable = DEBUG_SESSION_NOT_STARTED_CLUE;
+        } else {
+            if (vf == null) {
+                reasonNotToEnable = NO_FILE_SELECTED_CLUE;
             } else {
-                e.getPresentation().setEnabled(false);
+                VirtualFile sourceRoot = ProjectFileIndex.getInstance(e.getProject()).getSourceRootForFile(vf);
+                if (sourceRoot == null) {
+                    reasonNotToEnable = SOURCE_ROOT_IS_MISSING_CLUE;
+                } else {
+                    if (!"java".equals(vf.getExtension())) {
+                        reasonNotToEnable = NO_JAVA_CLASS_SELECTED_CLUE;
+            } else {
+                        // We need to use the info from the event to respect enablement state even if we are eager to show our action.
+                        e.getPresentation().setEnabled(e.getPresentation().isEnabled());
+                        e.getPresentation().setText(String.format("%s '%s'", defaultActionText, vf.getName()));
+                        return;
+                    }
+                }
             }
         }
+        // If action not enabled above it should be disabled. If the reason to not enable is available we are rendering it.
+                e.getPresentation().setEnabled(false);
+        e.getPresentation().setText(defaultActionText + reasonNotToEnable);
     }
 }
